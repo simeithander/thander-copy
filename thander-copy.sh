@@ -30,14 +30,17 @@ calculate_total_size() {
         total_size=$(stat -c%s "$source" 2>/dev/null || stat -f%z "$source" 2>/dev/null || echo "0")
     else
         # Se for um diretório, calcula o tamanho total recursivamente
-        total_size=$(find "$source" -type f -exec stat -c%s {} \; 2>/dev/null | awk '{sum += $1} END {print sum}')
-        if [ -z "$total_size" ]; then
-            total_size=$(find "$source" -type f -exec stat -f%z {} \; 2>/dev/null | awk '{sum += $1} END {print sum}')
+        total_size=$(find "$source" -type f -exec stat -c%s {} \; 2>/dev/null | awk '{sum += $1} END {printf "%.0f", sum}')
+        if [ -z "$total_size" ] || [ "$total_size" = "0" ]; then
+            total_size=$(find "$source" -type f -exec stat -f%z {} \; 2>/dev/null | awk '{sum += $1} END {printf "%.0f", sum}')
         fi
-        if [ -z "$total_size" ]; then
+        if [ -z "$total_size" ] || [ "$total_size" = "0" ]; then
             total_size=0
         fi
     fi
+    
+    # Garante que o resultado seja um número inteiro
+    total_size=$(echo "$total_size" | awk '{printf "%.0f", $1}')
     
     echo "$total_size"
 }
@@ -48,8 +51,16 @@ format_size() {
     local units=("B" "KB" "MB" "GB" "TB")
     local unit_index=0
     
-    while (( bytes >= 1024 )) && (( unit_index < ${#units[@]} - 1 )); do
-        bytes=$((bytes / 1024))
+    # Converte para número inteiro se estiver em notação científica
+    bytes=$(echo "$bytes" | awk '{printf "%.0f", $1}')
+    
+    # Usa awk para fazer a divisão e evitar problemas com números grandes
+    while (( unit_index < ${#units[@]} - 1 )); do
+        local result=$(echo "$bytes 1024" | awk '{printf "%.0f", $1 / $2}')
+        if (( result < 1 )); then
+            break
+        fi
+        bytes=$result
         ((unit_index++))
     done
     
@@ -70,6 +81,36 @@ format_time() {
     else
         echo "${secs}s"
     fi
+}
+
+# Função para animação do Pacman com timer
+pacman_animation() {
+    local start_time=$(date +%s)
+    local pacman_frames=("C" "c" "C" "c")
+    local dot_frames=("●" "○" "●" "○")
+    local frame_index=0
+    while true; do
+        local current_time=$(date +%s)
+        local elapsed=$((current_time - start_time))
+        local progress=$(( (elapsed % 20) ))
+        # Cria a barra de progresso com Pacman
+        local bar=""
+        for ((i=0; i<progress; i++)); do
+            bar="${bar}█"
+        done
+        if [ $progress -lt 20 ]; then
+            bar="${bar}${pacman_frames[$frame_index]}"
+        fi
+        for ((i=progress+1; i<20; i++)); do
+            bar="${bar}${dot_frames[$frame_index]}"
+        done
+        frame_index=$((frame_index + 1))
+        if [ $frame_index -ge ${#pacman_frames[@]} ]; then
+            frame_index=0
+        fi
+        echo -ne "\r⏳ [$bar] $(format_time $elapsed)"
+        sleep 0.2
+    done
 }
 
 # Loop principal do script
@@ -123,12 +164,20 @@ EOF
     fi
 
     echo "💬 Lendo arquivos... (isso pode levar algum tempo dependendo do tamanho dos arquivos)"
+    # Inicia a animação do Pacman em background
+    pacman_animation &
+    PACMAN_PID=$!
+    # Calcula o tamanho total que será copiado (isso leva tempo)
+    TOTAL_SIZE_TO_COPY=$(calculate_total_size "$SOURCE")
+    # Para a animação do Pacman
+    kill $PACMAN_PID 2>/dev/null
+    wait $PACMAN_PID 2>/dev/null
+    echo -e "\r✅ Análise concluída! [████████████████████]"
+    echo "📊 Tamanho total: $(format_size $TOTAL_SIZE_TO_COPY)"
+    echo ""
 
     # Captura o tempo de início da cópia
     START_TIME=$(date +%s)
-    
-    # Calcula o tamanho total que será copiado
-    TOTAL_SIZE_TO_COPY=$(calculate_total_size "$SOURCE")
     
 
     # --- Comando de Cópia ---
