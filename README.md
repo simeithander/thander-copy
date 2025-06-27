@@ -1,6 +1,6 @@
 # ⚡ THANDER COPY
 
-> **Uma ferramenta de terminal para copiar arquivos e pastas com verificação de integridade, barra de progresso animada, visual moderno e feedback detalhado!**
+> **Uma ferramenta de terminal para copiar arquivos e pastas com verificação de integridade, animações suaves, visual moderno e feedback detalhado!**
 
 ---
 
@@ -8,7 +8,8 @@
 
 - Visual inspirado em **neofetch** e **btop** (cores, caixas, separadores, emojis)
 - Cópia robusta com `rsync` e verificação de integridade (checksum)
-- Barra de progresso animada estilo Pacman durante análise
+- Animações suaves de spinner durante análise e sincronização
+- Feedback visual em tempo real durante a cópia
 - Resumo visual da cópia ao final
 - Mensagens de erro e sucesso destacadas
 - Suporte a caminhos com espaços e autocompletar
@@ -26,7 +27,7 @@ chmod +x thander-copy.sh
 1. **Execute o script** no terminal.
 2. **Arraste ou digite** o caminho do arquivo/pasta de ORIGEM e pressione Enter.
 3. **Arraste ou digite** o caminho da pasta de DESTINO e pressione Enter.
-4. Aguarde a análise (com animação!) e a cópia dos arquivos.
+4. Aguarde a análise (com animação de spinner!) e a cópia dos arquivos.
 5. Veja o resumo visual ao final!
 
 ---
@@ -42,14 +43,21 @@ chmod +x thander-copy.sh
 ──────────────────────────────────────────────────────────────────────
 Arraste ou digite o caminho do arquivo/pasta de ORIGEM e pressione Enter:
 Arraste ou digite o caminho da pasta de DESTINO e pressione Enter:
-💬 Lendo arquivos... (isso pode levar algum tempo dependendo do tamanho dos arquivos)
-⏳ [██████████C○○○○○○○○○○○○○○○○○○] 9s
-✅ Análise concluída! [████████████████████]
+⠋ Lendo arquivos...
+✅ Análise concluída!
 📊 Tamanho total: 1.5GB
+
+🔄 Iniciando cópia...
+arquivo.iso
+          2,83G 100%  762,05MB/s    0:00:03 (xfr#1, to-chk=0/1)
+🔄 Iniciando sincronização...
+⠙ Sincronizando dados...
+✅ Sincronização concluída!
+✅ Cópia concluída!
 
 ──────────────────────────────────────────────────────────────────────
 ┌─[ Resumo da Cópia ]
-│ ✅ Cópia concluída e dados verificados com sucesso!
+│ ✅ Dados verificados com sucesso!
 │ Origem: /caminho/origem
 │ Destino: /caminho/destino
 │ Tempo: 16s
@@ -71,18 +79,28 @@ Arraste ou digite o caminho da pasta de DESTINO e pressione Enter:
 
 ## 📝 **Funcionalidades**
 
-- Cópia de arquivos e pastas com preservação de permissões, datas e donos
-- Verificação de integridade via checksum (garante que tudo foi copiado corretamente)
-- Feedback visual durante análise e cópia
-- Resumo final com tempo, tamanho e status
-- Mensagens de erro amigáveis
-- Suporte a caminhos com espaços e autocompletar
+- **Cópia Robusta**: Arquivos e pastas com preservação de permissões, datas e donos
+- **Verificação de Integridade**: Checksum garante que tudo foi copiado corretamente
+- **Animações Suaves**: Spinner animado durante análise e sincronização
+- **Feedback em Tempo Real**: Progresso detalhado do rsync durante a cópia
+- **Sincronização Visual**: Feedback específico durante o processo de sync (importante para USB/dispositivos externos)
+- **Resumo Final**: Tempo, tamanho e status da operação
+- **Mensagens de Erro Amigáveis**: Validações claras e orientações
+
+---
+
+## 🔄 **Processo de Cópia**
+
+1. **Análise**: Calcula tamanho total com animação de spinner
+2. **Cópia**: rsync com progresso detalhado em tempo real
+3. **Sincronização**: Garante que dados em cache sejam escritos no dispositivo (especialmente importante para USB)
+4. **Verificação**: Checksum confirma integridade dos dados
+5. **Resumo**: Exibe estatísticas finais da operação
 
 ---
 
 ## ⚠️ **Limitações**
 
-- Não mostra barra de progresso customizada durante o rsync (usa a do próprio rsync)
 - Não faz cópia entre hosts remotos (apenas local)
 - Não há opção de exclusão/remoção, apenas cópia
 - Não há interface gráfica (apenas terminal)
