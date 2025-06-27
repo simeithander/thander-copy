@@ -56,87 +56,20 @@ format_size() {
     echo "${bytes}${units[$unit_index]}"
 }
 
-# Função para listar arquivos com informações detalhadas
-list_files_with_details() {
-    local source="$1"
-    local destination="$2"
+# Função para formatar tempo em segundos para formato legível
+format_time() {
+    local seconds="$1"
+    local hours=$((seconds / 3600))
+    local minutes=$(((seconds % 3600) / 60))
+    local secs=$((seconds % 60))
     
-    echo "📋 Analisando arquivos para cópia..."
-    
-    # Conta o número total de arquivos primeiro
-    local total_files=0
-    if [ -f "$source" ]; then
-        total_files=1
+    if [ $hours -gt 0 ]; then
+        echo "${hours}h ${minutes}m ${secs}s"
+    elif [ $minutes -gt 0 ]; then
+        echo "${minutes}m ${secs}s"
     else
-        total_files=$(find "$source" -type f 2>/dev/null | wc -l)
+        echo "${secs}s"
     fi
-    
-    # Mostra barra de progresso durante a análise real
-    echo -n "⏳ Analisando: ["
-    for ((i=0; i<20; i++)); do
-        echo -n " "
-    done
-    echo -n "] 0%"
-    
-    # Análise real dos arquivos com progresso
-    local analyzed_files=0
-    local file_list=()
-    local size_list=()
-    
-    if [ -f "$source" ]; then
-        # Se for um arquivo único
-        file_list=("$source")
-        size_list=($(stat -c%s "$source" 2>/dev/null || stat -f%z "$source" 2>/dev/null || echo "0"))
-        analyzed_files=1
-        
-        # Atualiza progresso
-        echo -ne "\r⏳ Analisando: [████████████████████] 100%"
-    else
-        # Se for um diretório, analisa arquivos com progresso real
-        while IFS= read -r -d '' file; do
-            ((analyzed_files++))
-            file_list+=("$file")
-            size_list+=($(stat -c%s "$file" 2>/dev/null || stat -f%z "$file" 2>/dev/null || echo "0"))
-            
-            # Atualiza progresso baseado no número real de arquivos
-            local progress=$((analyzed_files * 20 / total_files))
-            if [ $progress -gt 20 ]; then
-                progress=20
-            fi
-            
-            echo -ne "\r⏳ Analisando: ["
-            for ((j=0; j<progress; j++)); do
-                echo -n "█"
-            done
-            for ((j=progress; j<20; j++)); do
-                echo -n " "
-            done
-            echo -n "] $((progress * 5))%"
-            
-        done < <(find "$source" -type f -print0 2>/dev/null)
-    fi
-    
-    echo -e "\r✅ Análise concluída! [████████████████████] 100%"
-    
-    # Calcula o tamanho total
-    local total_size=0
-    for size in "${size_list[@]}"; do
-        total_size=$((total_size + size))
-    done
-    local total_size_formatted=$(format_size "$total_size")
-    
-    echo "📊 Tamanho total: $total_size_formatted"
-    echo "📁 Origem: $source"
-    echo "📂 Destino: $destination"
-    echo "📈 Total de arquivos: $total_files"
-    echo ""
-    
-    # Lista apenas os primeiros 5 arquivos (como apt/nala)
-    local max_display=5
-    local file_count=0
-    
-    echo "🚀 Iniciando cópia com verificação de integridade..."
-    echo
 }
 
 # Loop principal do script
@@ -189,10 +122,14 @@ EOF
         continue
     fi
 
-    echo
+    echo "💬 Lendo arquivos... (isso pode levar algum tempo dependendo do tamanho dos arquivos)"
 
-    # Lista os arquivos com informações detalhadas
-    list_files_with_details "$SOURCE" "$DESTINATION"
+    # Captura o tempo de início da cópia
+    START_TIME=$(date +%s)
+    
+    # Calcula o tamanho total que será copiado
+    TOTAL_SIZE_TO_COPY=$(calculate_total_size "$SOURCE")
+    
 
     # --- Comando de Cópia ---
     # Utiliza o rsync para a cópia. Veja a explicação dos parâmetros abaixo:
@@ -209,10 +146,18 @@ EOF
     # "$SOURCE":         A origem (entre aspas para tratar nomes com espaços).
     # "$DESTINATION":    O destino (entre aspas).
 
+    # Executa o rsync com feedback visual em tempo real
     rsync -ah --progress --info=progress2 --checksum "$SOURCE" "$DESTINATION"
-
+    
     # Captura o código de saída do rsync. 0 significa sucesso.
     EXIT_CODE=$?
+    
+    # Captura o tempo de fim da cópia
+    END_TIME=$(date +%s)
+    
+    # Calcula o tempo decorrido
+    ELAPSED_TIME=$((END_TIME - START_TIME))
+    
 
     # --- Verificação Final ---
 
@@ -221,7 +166,11 @@ EOF
     # Verifica o código de saída para determinar se tudo correu bem
     if [ $EXIT_CODE -eq 0 ]; then
         echo "✅ Cópia concluída e dados verificados com sucesso!"
-        echo "Os arquivos em '$SOURCE' e '$DESTINATION' são idênticos."
+        echo "Os dados copiados de '$SOURCE' e '$DESTINATION' foram verificados com sucesso e estão idênticos."
+        echo ""
+        echo "📊 Estatísticas da cópia:"
+        echo "   ⏱️  Tempo decorrido: $(format_time $ELAPSED_TIME)"
+        echo "   📦 Tamanho copiado: $(format_size $TOTAL_SIZE_TO_COPY)"
     else
         echo "❌ ATENÇÃO: Ocorreu um erro durante a cópia ou a verificação."
         echo "O processo retornou o código de erro: $EXIT_CODE"
