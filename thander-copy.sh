@@ -192,15 +192,26 @@ while true; do
     fi
 
     echo "💬 Lendo arquivos..."
-    # Inicia a animação do Pacman em background
-    pacman_animation &
-    PACMAN_PID=$!
+    # Inicia a animação de spinner em background
+    (
+        read_frames=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
+        frame_index=0
+        while true; do
+            echo -ne "\r${read_frames[$frame_index]} Lendo arquivos..."
+            frame_index=$((frame_index + 1))
+            if [ $frame_index -ge ${#read_frames[@]} ]; then
+                frame_index=0
+            fi
+            sleep 0.1
+        done
+    ) &
+    READ_ANIMATION_PID=$!
     # Calcula o tamanho total que será copiado (isso leva tempo)
     TOTAL_SIZE_TO_COPY=$(calculate_total_size "$SOURCE")
-    # Para a animação do Pacman
-    kill $PACMAN_PID 2>/dev/null
-    wait $PACMAN_PID 2>/dev/null
-    echo -e "\r✅ Análise concluída! [████████████████████]"
+    # Para a animação de leitura
+    kill $READ_ANIMATION_PID 2>/dev/null
+    wait $READ_ANIMATION_PID 2>/dev/null
+    echo -e "\r✅ Análise concluída!"
     echo "📊 Tamanho total: $(format_size $TOTAL_SIZE_TO_COPY)"
     echo ""
 
