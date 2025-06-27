@@ -207,7 +207,7 @@ while true; do
     # Captura o tempo de início da cópia
     START_TIME=$(date +%s)
     
-
+    echo "🔄 Iniciando cópia, isso pode levar algum tempo dependendo do tamanho dos arquivos"
     # --- Comando de Cópia ---
     # Utiliza o rsync para a cópia. Veja a explicação dos parâmetros abaixo:
     #
@@ -224,7 +224,7 @@ while true; do
     # "$DESTINATION":    O destino (entre aspas).
 
     # Executa o rsync com feedback visual em tempo real
-    rsync -ah --progress --info=progress2 --checksum "$SOURCE" "$DESTINATION"
+    rsync -ah --progress --info=progress2 --checksum "$SOURCE" "$DESTINATION" && sync && echo "✅ Cópia concluída!"
     
     # Captura o código de saída do rsync. 0 significa sucesso.
     EXIT_CODE=$?
@@ -243,7 +243,7 @@ while true; do
     # Verifica o código de saída para determinar se tudo correu bem
     if [ $EXIT_CODE -eq 0 ]; then
         print_box "Resumo da Cópia" \
-            "${color_green}✅ Cópia concluída e dados verificados com sucesso!${color_reset}" \
+            "${color_green}✅ Dados verificados com sucesso!${color_reset}" \
             "${color_cyan}Origem:${color_reset} $SOURCE" \
             "${color_cyan}Destino:${color_reset} $DESTINATION" \
             "${color_cyan}Tempo:${color_reset} $(format_time $ELAPSED_TIME)" \
