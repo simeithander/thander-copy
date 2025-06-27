@@ -191,7 +191,7 @@ while true; do
         continue
     fi
 
-    echo "💬 Lendo arquivos... (isso pode levar algum tempo dependendo do tamanho dos arquivos)"
+    echo "💬 Lendo arquivos..."
     # Inicia a animação do Pacman em background
     pacman_animation &
     PACMAN_PID=$!
@@ -207,7 +207,8 @@ while true; do
     # Captura o tempo de início da cópia
     START_TIME=$(date +%s)
     
-    echo "🔄 Iniciando cópia, isso pode levar algum tempo dependendo do tamanho dos arquivos"
+    echo "🔄 Iniciando cópia..."
+    
     # --- Comando de Cópia ---
     # Utiliza o rsync para a cópia. Veja a explicação dos parâmetros abaixo:
     #
@@ -224,10 +225,39 @@ while true; do
     # "$DESTINATION":    O destino (entre aspas).
 
     # Executa o rsync com feedback visual em tempo real
-    rsync -ah --progress --info=progress2 --checksum "$SOURCE" "$DESTINATION" && sync && echo "✅ Cópia concluída!"
+    rsync -ah --progress --info=progress2 --checksum "$SOURCE" "$DESTINATION"
     
     # Captura o código de saída do rsync. 0 significa sucesso.
     EXIT_CODE=$?
+    
+    # Se o rsync foi bem-sucedido, sincroniza os dados com animação
+    if [ $EXIT_CODE -eq 0 ]; then
+        echo "🔄 Iniciando sincronização..."
+        # Inicia animação de sincronização em background
+        (
+            sync_frames=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
+            frame_index=0
+            while true; do
+                echo -ne "\r${sync_frames[$frame_index]} Sincronizando dados..."
+                frame_index=$((frame_index + 1))
+                if [ $frame_index -ge ${#sync_frames[@]} ]; then
+                    frame_index=0
+                fi
+                sleep 0.1
+            done
+        ) &
+        SYNC_ANIMATION_PID=$!
+        
+        # Executa o sync
+        sync
+        
+        # Para a animação de sincronização
+        kill $SYNC_ANIMATION_PID 2>/dev/null
+        wait $SYNC_ANIMATION_PID 2>/dev/null
+        echo -e "\r✅ Sincronização concluída!"
+    fi
+    
+    echo "✅ Cópia concluída!"
     
     # Captura o tempo de fim da cópia
     END_TIME=$(date +%s)
@@ -240,7 +270,6 @@ while true; do
 
     print_separator
 
-    # Verifica o código de saída para determinar se tudo correu bem
     if [ $EXIT_CODE -eq 0 ]; then
         print_box "Resumo da Cópia" \
             "${color_green}✅ Dados verificados com sucesso!${color_reset}" \
