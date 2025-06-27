@@ -1,5 +1,39 @@
 #!/bin/bash
 
+# Funções de cor para terminal
+color_reset='\033[0m'
+color_red='\033[1;31m'
+color_green='\033[1;32m'
+color_yellow='\033[1;33m'
+color_blue='\033[1;34m'
+color_cyan='\033[1;36m'
+color_white='\033[1;37m'
+color_magenta='\033[1;35m'
+color_gray='\033[0;37m'
+
+print_banner() {
+    echo -e "${color_cyan}"
+    echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+    echo "┃   ⚡  THANDER COPY - Cópia poderosa com integridade e estilo!   ⚡   ┃"
+    echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+    echo -e "${color_reset}"
+}
+
+print_separator() {
+    echo -e "${color_gray}──────────────────────────────────────────────────────────────────────${color_reset}"
+}
+
+print_box() {
+    local title="$1"
+    shift
+    local content=("$@")
+    echo -e "${color_blue}┌─[ ${color_white}${title}${color_blue} ]${color_reset}"
+    for line in "${content[@]}"; do
+        echo -e "${color_blue}│${color_reset} $line"
+    done
+    echo -e "${color_blue}└${color_reset}"
+}
+
 # Função para limpar caminhos removendo aspas simples e duplas
 clean_path() {
     local path="$1"
@@ -115,17 +149,11 @@ pacman_animation() {
 
 # Loop principal do script
 while true; do
-    # Limpa o terminal para uma exibição mais limpa
     clear
-
-    cat << "EOF"
-⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡
-⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡ THANDER COPY ⚡⚡⚡⚡⚡⚡⚡⚡⚡
-⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡
-
-EOF
-    echo "🚀 Uma ferramenta poderosa para copiar arquivos e pastas com verificação de integridade."
-    echo "💡 Para sair do script, pressione Ctrl + C"
+    print_banner
+    echo -e "${color_white}🚀 Uma ferramenta poderosa para copiar arquivos e pastas com verificação de integridade.${color_reset}"
+    echo -e "${color_yellow}💡 Para sair do script, pressione Ctrl + C${color_reset}"
+    print_separator
     echo
 
     # Solicita ao usuário o arquivo ou pasta de origem
@@ -210,22 +238,22 @@ EOF
 
     # --- Verificação Final ---
 
-    echo "----------------------------------------------------"
+    print_separator
 
     # Verifica o código de saída para determinar se tudo correu bem
     if [ $EXIT_CODE -eq 0 ]; then
-        echo "✅ Cópia concluída e dados verificados com sucesso!"
-        echo "Os dados copiados de '$SOURCE' e '$DESTINATION' foram verificados com sucesso e estão idênticos."
-        echo ""
-        echo "📊 Estatísticas da cópia:"
-        echo "   ⏱️  Tempo decorrido: $(format_time $ELAPSED_TIME)"
-        echo "   📦 Tamanho copiado: $(format_size $TOTAL_SIZE_TO_COPY)"
+        print_box "Resumo da Cópia" \
+            "${color_green}✅ Cópia concluída e dados verificados com sucesso!${color_reset}" \
+            "${color_cyan}Origem:${color_reset} $SOURCE" \
+            "${color_cyan}Destino:${color_reset} $DESTINATION" \
+            "${color_cyan}Tempo:${color_reset} $(format_time $ELAPSED_TIME)" \
+            "${color_cyan}Tamanho:${color_reset} $(format_size $TOTAL_SIZE_TO_COPY)"
     else
-        echo "❌ ATENÇÃO: Ocorreu um erro durante a cópia ou a verificação."
-        echo "O processo retornou o código de erro: $EXIT_CODE"
+        print_box "Erro" \
+            "${color_red}❌ Ocorreu um erro durante a cópia ou a verificação.${color_reset}" \
+            "${color_yellow}Código de erro:${color_reset} $EXIT_CODE"
     fi
-
-    echo "----------------------------------------------------"
+    print_separator
     echo
     echo "🔄 Preparando para próxima cópia..."
     echo "Pressione Enter para continuar ou Ctrl + C para sair..."
