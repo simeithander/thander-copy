@@ -16,6 +16,7 @@ print_banner() {
     echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
     echo "┃   ⚡  THANDER COPY - Cópia poderosa com integridade e estilo!   ⚡   ┃"
     echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+    echo "Versão: 1.0.1"
     echo -e "${color_reset}"
 }
 
