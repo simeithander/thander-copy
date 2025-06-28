@@ -6,9 +6,34 @@
 
 ## 📦 **Instalação**
 
-### Instalação Automática (Recomendada)
+### Opção 1: Pacotes das Releases (Recomendado)
 
-Para instalar o script globalmente e poder executá-lo de qualquer lugar:
+Pacotes pré-compilados estão disponíveis nas [Releases](https://github.com/simeithander/thander-copy/releases):
+
+#### Para sistemas baseados em Debian/Ubuntu:
+```bash
+# Baixe o arquivo .deb da release mais recente
+wget https://github.com/simeithander/thander-copy/releases/latest/download/thander-copy_*.amd64.deb
+
+# Instale o pacote (Substitua o * pela versão)
+sudo dpkg -i thander-copy_*.amd64.deb
+
+# Se houver dependências faltando, execute:
+sudo apt-get install -f
+```
+
+#### Para sistemas baseados em Red Hat/Fedora:
+```bash
+# Baixe o arquivo .rpm da release mais recente
+wget https://github.com/simeithander/thander-copy/releases/latest/download/thander-copy-*.amd64.rpm
+
+# Instale o pacote (Substitua o * pela versão)
+sudo rpm -i thander-copy-*.amd64.rpm
+```
+
+### Opção 2: Instalação Automática via Script
+
+Para instalar o script globalmente a partir do código fonte:
 
 ```bash
 # Clone ou baixe o repositório
@@ -21,17 +46,7 @@ sudo ./install.sh
 
 Após a instalação, você poderá executar o comando `thander-copy` de qualquer diretório.
 
-### Desinstalação
-
-Para remover o script do sistema:
-
-```bash
-sudo ./uninstall.sh
-```
-
-O script pedirá confirmação antes de remover o programa.
-
-### Instalação Manual
+### Opção 3: Instalação Manual
 
 Se preferir não instalar globalmente:
 
@@ -42,6 +57,24 @@ chmod +x thander-copy.sh
 # Execute diretamente
 ./thander-copy.sh
 ```
+
+### Desinstalação
+
+#### Para pacotes DEB/RPM:
+```bash
+# Debian/Ubuntu
+sudo apt remove thander-copy
+
+# Red Hat/Fedora
+sudo rpm -e thander-copy
+```
+
+#### Para instalação via script:
+```bash
+sudo ./uninstall.sh
+```
+
+O script pedirá confirmação antes de remover o programa.
 
 ---
 
