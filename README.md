@@ -21,6 +21,16 @@ sudo ./install.sh
 
 Após a instalação, você poderá executar o comando `thander-copy` de qualquer diretório.
 
+### Desinstalação
+
+Para remover o script do sistema:
+
+```bash
+sudo ./uninstall.sh
+```
+
+O script pedirá confirmação antes de remover o programa.
+
 ### Instalação Manual
 
 Se preferir não instalar globalmente:
