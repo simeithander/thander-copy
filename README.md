@@ -4,6 +4,37 @@
 
 ---
 
+## 📦 **Instalação**
+
+### Instalação Automática (Recomendada)
+
+Para instalar o script globalmente e poder executá-lo de qualquer lugar:
+
+```bash
+# Clone ou baixe o repositório
+git clone <url-do-repositorio>
+cd thander-copy
+
+# Execute o instalador como root
+sudo ./install.sh
+```
+
+Após a instalação, você poderá executar o comando `thander-copy` de qualquer diretório.
+
+### Instalação Manual
+
+Se preferir não instalar globalmente:
+
+```bash
+# Torne o script executável
+chmod +x thander-copy.sh
+
+# Execute diretamente
+./thander-copy.sh
+```
+
+---
+
 ## ✨ **Destaques do Projeto**
 
 - Visual inspirado em **neofetch** e **btop** (cores, caixas, separadores, emojis)
