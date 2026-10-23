@@ -6,15 +6,22 @@ SCRIPT_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 
 # Verifica se está rodando como root
 if [ "$EUID" -ne 0 ]; then
-    echo "🚫 Este instalador precisa ser executado como root (use: sudo ./install-thander-copy.sh)"
+    echo "🚫 Este instalador precisa ser executado como root (use: sudo ./install.sh)"
     exit 1
 fi
 
 # Verifica dependências mínimas
-for cmd in bash rsync awk; do
+for cmd in bash rsync awk find realpath; do
     if ! command -v "$cmd" >/dev/null 2>&1; then
         echo "❌ Dependência ausente: $cmd"
         exit 1
+    fi
+done
+
+# Dependências opcionais: o script funciona sem elas, com menos recursos
+for cmd in findmnt lsblk python3 udisksctl fuser; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        echo "ℹ️  Opcional ausente: $cmd"
     fi
 done
 
