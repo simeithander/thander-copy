@@ -2,6 +2,10 @@
 
 > **Copie e mova arquivos pelo terminal com integridade verificada, gravação garantida no dispositivo e um painel de progresso moderno.**
 
+<p align="center">
+  <img src="screenshot.png" alt="Painel do thander-copy durante uma cópia, com barra de progresso, velocidade, tempo decorrido e tempo restante." width="820">
+</p>
+
 ---
 
 ## 📦 **Instalação**
